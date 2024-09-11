@@ -1,0 +1,5 @@
+config.py
+*.log
+*.exe
+.DS_Store
+*.pyc

@@ -50,25 +50,25 @@ def project_flux(mesh, cond_vec, nodal_field, M=None, return_M=False):
 
         # Step 3.1 : access the node indices of the element
         # complete the code below
-        node_indices =
+        node_indices = mesh.connectivity[el_id]
 
         # Step 3.2 : get the coordinates of the nodes and construct an element
         # complete the code below
-        X = mesh.
+        X = mesh.nodes[node_indices]
         
         element = Elements.Triangle(X, eltype, mesh.simultype)
 
         # Step 3.3 : assess nodal values corresponding to the element
         # complete the code below
-        elt_heads =
+        elt_heads =  nodal_field[node_indices]
 
         # Step 3.4 : compute nodal forces caused by the fluxes at the integration points
         # complete the code below
-        nodal_force_per_element = element.
+        nodal_force_per_element = element.project_element_flux(cond, elt_heads)
 
         # Step 3.5 : aggregate elemental forces in the global nodal forces array
         # complete the code below
-        nodal_force[] 
+        nodal_force[:, node_indices] += nodal_force_per_element
 
     # Step 4 : initiate an empty array for the nodal fluxes
     nodal_flux = np.zeros_like(nodal_force)
@@ -115,17 +115,17 @@ def assemble_mass_matrix(mesh, rho_vec):
 
         # access the node indices of the element
         # complete the code below
-        node_indices =
+        node_indices = mesh.connectivity[el_id]
 
         # get the coordinates of the nodes and construct an element
         # complete the code below
-        X = mesh.
+        X = mesh.nodes[node_indices]
         
         element = Elements.Triangle(X, eltype, mesh.simultype)
 
         # construct an elemental mass matrix
         # complete the code below
-        M_el = element.
+        M_el = element.element_mass_matrix(rho_e)
 
         # aggregate elemental matrices into the global mass matrix
         for i, ni in enumerate(node_indices):

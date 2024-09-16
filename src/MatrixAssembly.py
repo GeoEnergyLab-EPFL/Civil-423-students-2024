@@ -136,3 +136,51 @@ def assemble_mass_matrix(mesh, rho_vec):
 
     return sp.sparse.csc_matrix(M)
 
+def assemble_conductivity_matrix(mesh, cond):
+    # Function to assemble the conductivity matrix of the system
+    # inputs:
+    #   - mesh : one of our mesh objects
+    #   - cond : the scalar (for uniform permeabilit) or array containing the conductivity of the
+    #            material(s)
+    #
+    # outputs:
+    #   - C :: the assembled conductivity matrix for the complete system
+
+    # we pre-define an empty matrix
+    C = np.zeros((mesh.number_nodes, mesh.number_nodes))
+    eltype = find_eltype(mesh)
+
+    # we want to ensure the conductivity to be accessible by index
+    if np.isscalar(cond):
+        cond = [cond]
+
+    # we loop over all the elements
+    for el_id in range(mesh.number_els):
+
+        # we access the conductivity of the element by its ID
+        mat_id = mesh.id[el_id]
+        cond_e = cond[mat_id]
+
+        # access the node indices of the element
+        # complete the code below
+        # node_indices =
+
+        # get the coordinates of the nodes and construct an element
+        # complete the code below
+        # X = mesh.
+
+        # we define the element
+        elt = Elements.Triangle(X, eltype, mesh.simultype)
+
+        # construct the element conductivity matrix
+        # complete the code below
+        # C_el = element.
+
+        # We assemble the element wise component into the global conductivity matrix
+        for i, ni in enumerate(node_indices):
+            for j, nj in enumerate(node_indices):
+                # complete the code below
+                # C[ , ] += C_el[ , ]
+                C[ni, nj] += C_el[i, j]
+    
+    return sp.sparse.csc_matrix(C)

@@ -228,6 +228,37 @@ class Triangle:
             raise ValueError('Not implemented yet')
 
         return nodal_force_per_elem
+    
+    def compute_element_flux(self, cond, usol):
+
+        # chi, eta coordinates and weights of the gauss points
+        xg, wg = self.gaussian_quadrature[2]
+
+        if self.simultype == '2D':
+            N_i = self.N(xg)
+            DNaDx, j = self.gradN(xg)
+
+            # averaged flux per element
+            averaged_flux = np.zeros([self.dim])
+
+            for i in range(wg.size):
+              
+                # compute the flux by using Darcy formula
+                # complete the code below:
+                # averaged_flux =
+                raise NotImplementedError("You need to implement the flux calculation")
+         
+            # average flux between all the quadrature points
+            # complete the code below:
+            # averaged_flux /=
+            
+        elif self.simultype == 'axis':
+            raise ValueError('Not implemented yet')
+
+        else:
+            raise ValueError('Not implemented yet')
+
+        return averaged_flux
 
 class Segment:
     def __init__(self, X, eltype='linear', simultype='2D'):

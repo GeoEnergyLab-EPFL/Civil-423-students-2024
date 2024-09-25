@@ -163,18 +163,18 @@ def assemble_conductivity_matrix(mesh, cond):
 
         # access the node indices of the element
         # complete the code below
-        # node_indices =
+        node_indices = mesh.connectivity[el_id]
 
         # get the coordinates of the nodes and construct an element
         # complete the code below
-        # X = mesh.
+        X = mesh.nodes[node_indices]
 
         # we define the element
         elt = Elements.Triangle(X, eltype, mesh.simultype)
 
         # construct the element conductivity matrix
         # complete the code below
-        # C_el = element.
+        C_el = elt.element_conductivity_matrix(cond_e)
 
         # We assemble the element wise component into the global conductivity matrix
         for i, ni in enumerate(node_indices):

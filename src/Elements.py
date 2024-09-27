@@ -245,12 +245,11 @@ class Triangle:
               
                 # compute the flux by using Darcy formula
                 # complete the code below:
-                # averaged_flux =
-                raise NotImplementedError("You need to implement the flux calculation")
-         
+                averaged_flux = -cond * DNaDx[i] @ usol
+                
             # average flux between all the quadrature points
             # complete the code below:
-            # averaged_flux /=
+            averaged_flux /= wg.size
             
         elif self.simultype == 'axis':
             raise ValueError('Not implemented yet')

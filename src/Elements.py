@@ -203,6 +203,35 @@ class Triangle:
         B = np.moveaxis(B, -1, 0)
         return B, j
 
+    def project_element_stress(self, D, displacement):
+
+        # chi, eta coordinates and weights of the gauss points
+        xg, wg = self.gaussian_quadrature[2]
+        N_i = self.N(xg)
+        B, j = self.B_strain_matrix(xg)
+
+        # we initially solve for the displacement
+        A = np.einsum('ijk, k -> ij', B, displacement)
+        solve = np.einsum('ij, ki -> kj', D, A)
+
+        # we assemble the matrix and solve the system according to the
+        # element
+        if self.simultype == '2D':
+            # it is simpler for broadcasting to multiply j_i and wg_i together
+            scale = j * wg
+
+        elif self.simultype == 'axis':
+            # in the axissymmetric case we need to multiply by the jacobian and 2pi
+            mapx = self.mapX(xg)
+            scale = 2 * np.pi * j * wg * mapx[:, 0]
+
+        else:
+            raise ValueError('Not implemented yet')
+
+        f_el = np.sum(scale[:, None, None] *
+                      np.einsum('ij, ik -> ijk', N_i, solve), axis=0)
+
+        return f_el
     
     def project_element_flux(self, cond, sol):
 

@@ -104,13 +104,15 @@ def project_stress(mesh, E_vec, nu_vec, displacement, M=None, return_M=False):
 
     # If the provided material parameters are scalars we transform them in the correct
     # sized array
-
     # Complete below
     # if xxx:
     #
     # if xxx:
     #
-
+    if np.isscalar(E_vec):
+        E_vec = [E_vec]
+    if np.isscalar(nu_vec):
+        nu_vec = [nu_vec]
 
     # Step 1 : creation of the mesh matrix
     # In case M (the Mass matrix) was already computed, to see for example stress evolution over time
@@ -128,31 +130,35 @@ def project_stress(mesh, E_vec, nu_vec, displacement, M=None, return_M=False):
     # Step 3 : iterating through the mesh
     for el_id in range(mesh.number_els):
         # based on the material ID, we access the material properties
-        
         # Complete below
         # mat_id =
         # E =
         #  nu =
-        
+        mat_id = mesh.id[el_id]
+        E = E_vec[mat_id]
+        nu = nu_vec[mat_id]
+
         # we need to transform the properties to the bulk (k) and shear
         # modulus (g)
-        
         # Complete below
         # k =
         # g =
-        
+        k = prop.bulk_modulus(E, nu)
+        g = prop.shear_modulus(E, nu)
+
         # We want to obtain the elastic stiffness matrix
         D = elastic_isotropic_stiffness(k, g, mesh.simultype)
 
         # Step 3.1 : access the node indices of the element and degrees of freedom
-        
         # Complete below
         # n_e =
         # n_dof =
-        
+        n_e = mesh.connectivity[el_id]
+        n_dof = np.vstack([2 * n_e, 2 * n_e + 1]).reshape(-1, order='F')
+
         # Complete below
         # Step 3.2 : get the coordinates of the nodes and construct an element
-        #X = 
+        X = mesh.nodes[n_e]
 
         # Step 3.3 : assemble the element
         elt = Elements.Triangle(X, eltype, mesh.simultype)

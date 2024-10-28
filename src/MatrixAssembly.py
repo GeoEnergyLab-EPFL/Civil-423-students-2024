@@ -353,6 +353,58 @@ def assemble_conductivity_matrix(mesh, cond):
     
     return sp.sparse.csc_matrix(C)
 
+
+def assemble_coupling_matrix(mesh, alpha_vec):
+    # Function to assemble the coupling matrix of the system
+    # inputs:
+    #   - mesh : one of our mesh objects
+    #   - alpha_Vec : the scalar (for uniform permeabilit) or array containing the transmissivity of the
+    #                 material(s)
+    #
+    # outputs:
+    #   - C :: the assembled coupling matrix for the complete system
+
+    # we pre-define an empty matrix
+    C = np.zeros((2 * mesh.number_nodes, mesh.number_nodes))
+    
+    # We get the element type
+    eltype = find_eltype(mesh)
+
+    # If the provided material parameter are scalars we transform them in the correct
+    # sized array
+    if np.isscalar(alpha_vec):
+        alpha_vec = [alpha_vec]
+
+    # we now loop over all the elements to obtain a the mass matrix
+    for e in range(mesh.number_els):
+
+        # we access the transmissivity of the material by its ID
+        mat_id = mesh.id[e]
+        alpha = alpha_vec[mat_id]
+
+        # access the nodes index of element e
+        n_e = mesh.connectivity[e]
+        n_dof = np.vstack([2 * n_e, 2 * n_e + 1]).reshape(-1, order='F')
+
+        # we get the coordinates of the nodes
+        # complete the code below
+        # X =
+
+        # create an element with its coordinates, type and simulation type
+        # complete the code below
+        # elt =
+
+        # build an elementary coupling matrix
+        ce_el = elt.element_coupling_matrix(alpha)
+
+        # fill in the global coupling matrix
+        for i, ni in enumerate(n_dof):
+            for j, nj in enumerate(n_e):
+                # complete the code below
+                # C[...]
+                
+    return sp.sparse.csc_matrix(C)
+
 def assemble_tractions_over_line(mesh, node_list, traction):
 
     # we obtain the element type from the mesh

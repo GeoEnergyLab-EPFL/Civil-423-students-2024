@@ -202,7 +202,32 @@ class Triangle:
         # we rearrange the tensor so that it has a shape of (n gauss points, ndim, m)
         B = np.moveaxis(B, -1, 0)
         return B, j
+   
+    def element_stress_field(self, stress_field):
 
+        # chi, eta coordinates and weights of the gauss points
+        xg, wg = self.gaussian_quadrature[2]
+        B, j = self.B_strain_matrix(xg)
+
+        # we transpose the B matrix for every gauss point
+        BT = np.moveaxis(B, -1, -2)
+
+        # scale is a scaling factor for every gauss points
+        if self.simultype == '2D':
+            scale = j * wg
+
+        elif self.simultype == 'axis':
+            mapx = self.mapX(xg)
+            scale = 2 * np.pi * j * wg * mapx[:, 0]
+
+        else:
+            raise ValueError('Not implemented yet')
+
+        A = BT @ stress_field
+        s_el = scale @ A
+
+        return s_el
+    
     def project_element_stress(self, D, displacement):
 
         # chi, eta coordinates and weights of the gauss points

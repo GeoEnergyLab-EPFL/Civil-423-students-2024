@@ -32,8 +32,7 @@ class MeshUtils:
         ic += mesh3.number_nodes
         # we now add them to the mesh6 object
         mesh6.nodes = np.vstack((mesh3.nodes, new_nodes))
-        mesh6.connectivity = np.hstack(
-            (mesh3.connectivity, np.hstack((ic[:ne], ic[ne:2 * ne], ic[2 * ne:]))))
+        mesh6.connectivity = np.hstack((mesh3.connectivity, np.vstack((ic[:ne], ic[ne:2 * ne], ic[2 * ne:])).T))
         mesh6.number_nodes = len(mesh6.nodes)
 
         return mesh6

@@ -387,10 +387,12 @@ def assemble_coupling_matrix(mesh, alpha_vec):
         n_dof = np.vstack([2 * n_e, 2 * n_e + 1]).reshape(-1, order='F')
 
         # we get the coordinates of the nodes
+        X = mesh.nodes[n_e]
         # complete the code below
         # X =
 
         # create an element with its coordinates, type and simulation type
+        elt = Elements.Triangle(X, eltype, mesh.simultype)
         # complete the code below
         # elt =
 
@@ -400,10 +402,9 @@ def assemble_coupling_matrix(mesh, alpha_vec):
         # fill in the global coupling matrix
         for i, ni in enumerate(n_dof):
             for j, nj in enumerate(n_e):
+                C[ni, nj] += ce_el[i, j]
                 # complete the code below
-                pass
                 # C[...]
-                
     return sp.sparse.csc_matrix(C)
 
 def set_stress_field(mesh, stress_field, applied_nodes=None):

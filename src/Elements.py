@@ -210,13 +210,13 @@ class Triangle:
         #          wg --> weights of the gauss points
         
         # complete below
-        # xg, wg = self.xxx
+        xg, wg = self.gaussian_quadrature[2]
         
         # Step 2 : Obtain the B-matrix, the jacobian, and the shape funciton
         
         # complete below
-        # B, j = self.xxx
-        # N_i = self.xxx
+        B, j = self.B_strain_matrix(xg)
+        N_i = self.N(xg)
         
         # Step 3 : calculate the pre-multiplication constant
         #          Note that it differs from the '2D' to the
@@ -224,18 +224,12 @@ class Triangle:
         # complete below
         if self.simultype == '2D':
             Baux = B[:, 0] + B[:, 1]    # re-shaping of the B-matrix
-
-            #######CHANGE THE PREMULTIPLICATION CONSTANT HERE########
-            
-            premult = 1                # pre-multiplication constant
+            premult = wg * j * alpha    # pre-multiplication constant
 
         elif self.simultype == 'axis':
             Baux = B[:, 0] + B[:, 1] + B[:, -1] # re-shaping of the B-matrix
             mapx = self.mapX(xg)                # Mapping on the axissymetric coordinate system
-            
-            ########CHANGE THE PREMULTIPLICATION CONSTANT HERE########
-             
-            # premult =                 # pre-multiplication constant
+            premult = 2 * np.pi * wg * j * alpha * mapx[:, 0]   # pre-multiplication constant
 
         else:
             raise ValueError('Not implemented yet')
@@ -245,8 +239,7 @@ class Triangle:
         # loop over the integration points
         for ip in range(premult.size):
             # complete below
-            pass
-            # ce_el =
+            ce_el += premult[ip] * np.outer(Baux[ip], N_i[ip])
             
         # return the element coupling matrix
         return ce_el

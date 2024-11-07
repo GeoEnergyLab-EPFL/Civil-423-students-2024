@@ -208,30 +208,33 @@ class Triangle:
         # Step 1 : Get the coordinates and corresponding weigths of gauss points
         #          xg = (chi, eta) coordinates of the gauss points
         #          wg --> weights of the gauss points
+        
         # complete below
         # xg, wg = self.xxx
-        xg, wg = self.gaussian_quadrature[2]
-
+        
         # Step 2 : Obtain the B-matrix, the jacobian, and the shape funciton
+        
         # complete below
         # B, j = self.xxx
         # N_i = self.xxx
-        B, j = self.B_strain_matrix(xg)
-        N_i = self.N(xg)
-
+        
         # Step 3 : calculate the pre-multiplication constant
         #          Note that it differs from the '2D' to the
         #          axissymetric case.
         # complete below
         if self.simultype == '2D':
             Baux = B[:, 0] + B[:, 1]    # re-shaping of the B-matrix
-            premult = wg * j * alpha    # pre-multiplication constant
-            # premult =                 # pre-multiplication constant
+
+            #######CHANGE THE PREMULTIPLICATION CONSTANT HERE########
+            
+            premult = 1                # pre-multiplication constant
 
         elif self.simultype == 'axis':
             Baux = B[:, 0] + B[:, 1] + B[:, -1] # re-shaping of the B-matrix
             mapx = self.mapX(xg)                # Mapping on the axissymetric coordinate system
-            premult = 2 * np.pi * wg * j * alpha * mapx[:, 0]   # pre-multiplication constant
+            
+            ########CHANGE THE PREMULTIPLICATION CONSTANT HERE########
+             
             # premult =                 # pre-multiplication constant
 
         else:
@@ -242,9 +245,9 @@ class Triangle:
         # loop over the integration points
         for ip in range(premult.size):
             # complete below
+            pass
             # ce_el =
-            ce_el += premult[ip] * np.outer(Baux[ip], N_i[ip])
-        
+            
         # return the element coupling matrix
         return ce_el
     

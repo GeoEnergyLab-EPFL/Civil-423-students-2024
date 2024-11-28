@@ -433,6 +433,75 @@ def set_stress_field(mesh, stress_field, applied_nodes=None):
 
     return S
 
+def set_body_force(mesh, body_force_func, applied_nodes=None):
+
+    '''
+    computes the nodal forces due to a body force applied to the domain
+    args:
+    mesh : mesh object
+    body_force_func : function calculating the body force as a function of x,y. Should return an array of shape (2,)        
+    
+    '''
+    S = np.zeros(2 * mesh.number_nodes)
+    
+    eltype = find_eltype(mesh)
+
+    # we want to find nodes with applied stress
+    if applied_nodes is None:
+        # if not specified, we apply the stress to the entire domain
+        applied_nodes = np.arange(mesh.number_nodes)
+
+    # we find the elements where every node has applied stress
+    il = np.isin(mesh.connectivity, applied_nodes)
+    elt_line = np.argwhere(il.sum(axis=1) == mesh.connectivity.shape[1])[:, 0]
+
+    for i, e in enumerate(elt_line):
+
+        n_e = mesh.connectivity[e]
+        n_dof = np.vstack([2 * n_e, 2 * n_e + 1]).reshape(-1, order='F')
+        X = mesh.nodes[n_e]
+
+        elt = Elements.Triangle(X, eltype, mesh.simultype)
+        S_el = elt.compute_element_body_force(body_force_func)
+        S[n_dof] += S_el
+
+    return S
+
+def set_initial_stress_field(mesh, stress_field, applied_nodes=None):
+    
+    '''
+    computes the nodal forces due to the initial stress field in the domain
+    args:
+    mesh : mesh object
+    stress_field : function calculating the stress field as a function of x,y
+    
+    '''
+    
+    S = np.zeros(2 * mesh.number_nodes)
+    
+    eltype = find_eltype(mesh)
+
+    # we want to find nodes with applied stress
+    if applied_nodes is None:
+        # if not specified, we apply the stress to the entire domain
+        applied_nodes = np.arange(mesh.number_nodes)
+
+    # we find the elements where every node has applied stress
+    il = np.isin(mesh.connectivity, applied_nodes)
+    elt_line = np.argwhere(il.sum(axis=1) == mesh.connectivity.shape[1])[:, 0]
+
+    for i, e in enumerate(elt_line):
+
+        n_e = mesh.connectivity[e]
+        n_dof = np.vstack([2 * n_e, 2 * n_e + 1]).reshape(-1, order='F')
+        X = mesh.nodes[n_e]
+
+        elt = Elements.Triangle(X, eltype, mesh.simultype)
+        S_el = elt.element_insitu_stress_field(stress_field)
+        S[n_dof] += S_el
+
+    return S
+
 
 def assemble_tractions_over_line(mesh, node_list, traction):
 

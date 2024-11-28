@@ -269,6 +269,85 @@ class Triangle:
 
         return s_el
     
+    def compute_element_body_force(self, body_force_func):
+        """
+        Compute the body force term for an element.
+
+        """
+        # chi, eta coordinates and weights of the gauss points
+        xg, wg = self.gaussian_quadrature[2]
+        N_i = self.N(xg)
+        B, j = self.B_strain_matrix(xg)
+        coords = self.mapX(xg)
+                
+        # Initialize the body force vector
+        F_body = np.zeros((B.shape[2],))
+        
+        force_func =  np.array([body_force_func(x, y) for x, y in coords])
+        
+        # Loop over Gauss points
+        for i in range(len(xg)):
+            # Compute shape functions at Gauss point
+            N = N_i[i,:]  # Shape functions at Gauss point i (1D array)
+            
+            if self.simultype == '2D':
+                scale = j[i] * wg[i]
+
+            elif self.simultype == 'axis':
+                mapx = self.mapX(xg[i])
+                scale = 2 * np.pi * j[i] * wg[i] * mapx[i, 0]
+            else:
+               raise ValueError('Not implemented yet')
+        
+            F_gp = scale * np.kron(N, force_func[i]) 
+            
+            F_body += F_gp
+            
+        return F_body
+
+
+    def element_initial_stress_field(self, stress_field_func):
+        """
+        Compute the in-situ stress contribution to the force vector in FEM weak form.
+        Accepts stress_field_func as a function of x, y coordinates.
+
+        Parameters:
+        - stress_field_func: A callable function that takes x, y coordinates and returns the stress field.
+
+        Returns:
+        - s_el: The element-level force vector contribution due to in-situ stresses.
+        """
+        # chi, eta coordinates and weights of the gauss points
+        xg, wg = self.gaussian_quadrature[2]
+        B, j = self.B_strain_matrix(xg)
+        coords = self.mapX(xg)
+        
+        # we transpose the B matrix for every gauss point
+        BT = np.moveaxis(B, -1, -2)
+
+        # Evaluate the stress field at Gauss points
+        stress_field = np.array([stress_field_func(x, y) for x, y in coords])
+        
+        # scale is a scaling factor for every gauss points
+        if self.simultype == '2D':
+            scale = j * wg
+
+        elif self.simultype == 'axis':
+            mapx = self.mapX(xg)
+            scale = 2 * np.pi * j * wg * mapx[:, 0]
+
+        else:
+            raise ValueError('Not implemented yet')
+
+        A = np.zeros((wg.shape[0], BT.shape[1])) 
+
+        for i in range(len(xg)):
+            A[i] = BT[i,:,:] @ stress_field[i]
+        
+        s_el = scale @ A
+
+        return s_el
+    
     def project_element_stress(self, D, displacement):
 
         # chi, eta coordinates and weights of the gauss points

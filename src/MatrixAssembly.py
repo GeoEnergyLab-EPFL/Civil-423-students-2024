@@ -497,7 +497,7 @@ def set_initial_stress_field(mesh, stress_field, applied_nodes=None):
         X = mesh.nodes[n_e]
 
         elt = Elements.Triangle(X, eltype, mesh.simultype)
-        S_el = elt.element_insitu_stress_field(stress_field)
+        S_el = elt.element_initial_stress_field(stress_field)
         S[n_dof] += S_el
 
     return S

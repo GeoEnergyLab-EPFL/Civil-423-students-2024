@@ -393,7 +393,7 @@ class Triangle:
                 flux_at_ip = -cond * DNaDx[i] @ sol
                 for k in range(self.dim):
                     nodal_force_per_elem[k] += wg[i] * \
-                        j[i] * N_i[:, i] * flux_at_ip[k]
+                        j[i] * N_i[i, :] * flux_at_ip[k]
 
         elif self.simultype == 'axis':
             raise ValueError('Not implemented yet')
